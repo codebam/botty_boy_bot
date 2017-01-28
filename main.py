@@ -75,7 +75,6 @@ def main():
     dp.add_handler(CommandHandler("help", start))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(InlineQueryHandler(inlinequery))
 
     # log all errors
     dp.add_error_handler(error)

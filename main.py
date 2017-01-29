@@ -13,6 +13,7 @@ from urllib.parse import quote_plus
 import configparser
 from os import environ
 import requests
+import json
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -24,8 +25,28 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    bot.sendMessage(update.message.chat_id, text='''Hello, I am an Inline bot, \
-please use me by mentioning my username in a chat along with your query''')
+    bot.sendMessage(update.message.chat_id, text='''Hello, I am a bot that matches you with people of the same interests. To start talking to others, you may ask a question with /ask. Otherwise, you can subscribe to updates from other users with /subscribe.''')
+
+
+def add_user(userID):
+    new_user = True
+    with open('userdata.json', 'r') as f: # read file
+        json_data = json.load(f)
+    user = { 'userID' : userID }
+    for _user in json_data['Users']:
+        if (_user.get("userID") == userID): # if the user isn't already in the list
+            new_user = False
+            break
+    if new_user:
+        json_data['Users'].append(user)
+
+    with open('userdata.json', 'w') as f: # write file
+        json.dump(json_data, f)
+
+
+def subscribe(bot, update):
+    add_user(update.message.from_user.id)
+
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -73,6 +94,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
+    dp.add_handler(CommandHandler("subscribe", subscribe))
 
     # on noncommand i.e message - echo the message on Telegram
 

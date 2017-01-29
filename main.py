@@ -39,6 +39,8 @@ def new_user(userID):
 
 
 def add_user(userID):
+    with open('userdata.json', 'r') as f: # read file
+        json_data = json.load(f)
     if new_user(userID):
         json_data['Users'].append(user)
     with open('userdata.json', 'w') as f: # write file

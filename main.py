@@ -28,20 +28,26 @@ def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='''Hello, I am a bot that matches you with people of the same interests. To start talking to others, you may ask a question with /ask. Otherwise, you can subscribe to updates from other users with /subscribe.''')
 
 
-def add_user(userID):
-    new_user = True
+def new_user(userID):
     with open('userdata.json', 'r') as f: # read file
         json_data = json.load(f)
     user = { 'userID' : userID }
     for _user in json_data['Users']:
         if (_user.get("userID") == userID): # if the user isn't already in the list
-            new_user = False
-            break
-    if new_user:
-        json_data['Users'].append(user)
+            return False
+    return True
 
+
+def add_user(userID):
+    if new_user(userID):
+        json_data['Users'].append(user)
     with open('userdata.json', 'w') as f: # write file
         json.dump(json_data, f)
+
+
+def modify_user(bot, update):
+    if new_user(update.message.from_user.id):
+        bot.sendMessage(update.message.chat_id, text='''Please use /subscribe before trying to modify user settings.''')
 
 
 def subscribe(bot, update):
